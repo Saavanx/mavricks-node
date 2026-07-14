@@ -1,0 +1,11 @@
+[[redirects]]
+  from = "/api/*"
+  to = "https://api.mavricks.fun/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/pay/*"
+  to = "https://api.mavricks.fun/pay/:splat"
+  status = 200
+  force = true
