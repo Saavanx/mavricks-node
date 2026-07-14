@@ -14,6 +14,8 @@ const jwksClient = require('jwks-rsa');
 const firebaseJwksClient = jwksClient({
   jwksUri: 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com',
   cache: true,
+  cacheMaxEntries: 10,
+  cacheMaxAge: 600000, // 10 minutes
   rateLimit: true,
   jwksRequestsPerMin: 10
 });
@@ -21,6 +23,7 @@ const firebaseJwksClient = jwksClient({
 function getFirebaseSigningKey(header, callback) {
   firebaseJwksClient.getSigningKey(header.kid, function(err, key) {
     if (err) {
+      console.error('JWKS getSigningKey error:', err.message, 'kid:', header.kid);
       callback(err);
     } else {
       const signingKey = key.getPublicKey();
@@ -37,6 +40,7 @@ function verifyFirebaseToken(token, projectId) {
       audience: projectId
     }, (err, decoded) => {
       if (err) {
+        console.error('Firebase token verify failed:', err.name, err.message);
         reject(err);
       } else {
         resolve(decoded);
@@ -337,9 +341,9 @@ app.get('/health', (req, res) => {
 app.get('/api/firebase-config', (req, res) => {
   res.json({
     apiKey: process.env.FIREBASE_API_KEY || 'AIzaSyFakeKeyForUATTestingPlaceholder',
-    authDomain: process.env.FIREBASE_AUTH_DOMAIN || 'mavricks-auth.firebaseapp.com',
-    projectId: process.env.FIREBASE_PROJECT_ID || 'mavricks-auth',
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET || 'mavricks-auth.appspot.com',
+    authDomain: process.env.FIREBASE_AUTH_DOMAIN || 'mavricks-events.firebaseapp.com',
+    projectId: process.env.FIREBASE_PROJECT_ID || 'mavricks-events',
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET || 'mavricks-events.appspot.com',
     messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || '1234567890',
     appId: process.env.FIREBASE_APP_ID || '1:1234567890:web:abcdef123456'
   });
@@ -353,7 +357,7 @@ app.get('/api/profile', async (req, res) => {
   }
 
   const token = authHeader.split(' ')[1];
-  const firebaseProjectId = process.env.FIREBASE_PROJECT_ID || 'mavricks-auth';
+  const firebaseProjectId = process.env.FIREBASE_PROJECT_ID || 'mavricks-events';
   
   try {
     const firebaseUser = await verifyFirebaseToken(token, firebaseProjectId);
@@ -400,7 +404,7 @@ app.post('/api/profile', async (req, res) => {
   }
 
   const token = authHeader.split(' ')[1];
-  const firebaseProjectId = process.env.FIREBASE_PROJECT_ID || 'mavricks-auth';
+  const firebaseProjectId = process.env.FIREBASE_PROJECT_ID || 'mavricks-events';
   
   try {
     const firebaseUser = await verifyFirebaseToken(token, firebaseProjectId);
@@ -441,7 +445,7 @@ app.post('/api/create-payment-session', async (req, res) => {
     
     if (authHeader.startsWith('Bearer ')) {
       const token = authHeader.split(' ')[1];
-      const firebaseProjectId = process.env.FIREBASE_PROJECT_ID || 'mavricks-auth';
+      const firebaseProjectId = process.env.FIREBASE_PROJECT_ID || 'mavricks-events';
       try {
         firebaseUser = await verifyFirebaseToken(token, firebaseProjectId);
       } catch (err) {
@@ -692,7 +696,7 @@ app.get('/api/user-bookings', async (req, res) => {
     return res.status(401).json({ ok: false, error: 'Unauthorized' });
   }
   const token = authHeader.split(' ')[1];
-  const firebaseProjectId = process.env.FIREBASE_PROJECT_ID || 'mavricks-auth';
+  const firebaseProjectId = process.env.FIREBASE_PROJECT_ID || 'mavricks-events';
   try {
     const firebaseUser = await verifyFirebaseToken(token, firebaseProjectId);
     const sql = getSql();
