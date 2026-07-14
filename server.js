@@ -119,18 +119,23 @@ const allowedOrigins = [
   'http://localhost:4000'
 ];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      console.error('CORS blocked origin:', origin);
-      const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
-  credentials: true
-}));
+app.use((req, res, next) => {
+  if (req.path === '/api/confirm-payment') {
+    return next();
+  }
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        console.error('CORS blocked origin:', origin);
+        const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
+    credentials: true
+  })(req, res, next);
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
