@@ -221,7 +221,7 @@ function extractEncDataFromResponseBody(bodyText) {
   return null;
 }
 
-async function initiateNttAuth(booking) {
+async function initiateNttAuth(booking, retries = 2) {
   const txnDate = buildTxnDate();
   const jsonData = JSON.stringify({
     payInstrument: {
@@ -256,42 +256,78 @@ async function initiateNttAuth(booking) {
   });
 
   const encData = encrypt(jsonData);
-  const response = await fetch(nttConfig.authUrl, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/x-www-form-urlencoded',
-      'cache-control': 'no-cache',
-    },
-    body: new URLSearchParams({ encData, merchId: nttConfig.merchantId }).toString(),
-  });
 
-  const bodyText = await response.text();
-  if (!response.ok) {
-    throw new Error(`NTT auth failed with status ${response.status}: ${bodyText}`);
-  }
-
-  const encodedResponse = extractEncDataFromResponseBody(bodyText);
-  if (!encodedResponse) {
-    try {
-      const logDir = path.join(__dirname, 'logs');
-      fs.mkdirSync(logDir, { recursive: true });
-      const file = path.join(logDir, 'ntt-missing-enc.log');
-      const entry = JSON.stringify({ ts: new Date().toISOString(), url: nttConfig.authUrl, status: response.status, body: bodyText }) + '\n\n';
-      fs.appendFileSync(file, entry, 'utf8');
-    } catch (err) {
-      // ignore logging errors
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    if (attempt > 0) {
+      // Exponential backoff: 1s, 2s
+      await new Promise(r => setTimeout(r, attempt * 1000));
+      console.log(`NTT auth retry attempt ${attempt}/${retries} for txn ${booking.txnId}`);
     }
-    console.error('NTT auth did not return encData — raw response saved to logs/ntt-missing-enc.log');
-    throw new Error('NTT auth did not return encData');
-  }
 
-  const decryptedText = decrypt(encodedResponse);
-  const parsed = JSON.parse(decryptedText);
-  return {
-    atomTokenId: parsed.atomTokenId || parsed?.data?.atomTokenId || '',
-    responseDetails: parsed.responseDetails || {},
-    merchTxnId: booking.txnId,
-  };
+    let response, bodyText;
+    try {
+      response = await fetch(nttConfig.authUrl, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/x-www-form-urlencoded',
+          'cache-control': 'no-cache',
+        },
+        body: new URLSearchParams({ encData, merchId: nttConfig.merchantId }).toString(),
+      });
+      bodyText = await response.text();
+    } catch (fetchErr) {
+      if (attempt === retries) throw new Error(`NTT gateway unreachable: ${fetchErr.message}`);
+      continue;
+    }
+
+    // Detect HTML error pages (503, 502, etc.) returned with status 200
+    const isHtmlError = bodyText.trim().startsWith('<') &&
+      (bodyText.includes('503') || bodyText.includes('502') || bodyText.includes('Unavailable') || bodyText.includes('Bad Gateway'));
+
+    if (!response.ok || isHtmlError) {
+      console.warn(`NTT auth attempt ${attempt + 1}: status=${response.status}, html_error=${isHtmlError}`);
+      if (attempt === retries) {
+        // Log for diagnostics
+        try {
+          const logDir = path.join(__dirname, 'logs');
+          fs.mkdirSync(logDir, { recursive: true });
+          const file = path.join(logDir, 'ntt-missing-enc.log');
+          const entry = JSON.stringify({ ts: new Date().toISOString(), url: nttConfig.authUrl, status: response.status, body: bodyText }) + '\n\n';
+          fs.appendFileSync(file, entry, 'utf8');
+        } catch (_) {}
+        const errMsg = isHtmlError
+          ? 'Payment gateway is temporarily unavailable. Please try again in a few minutes.'
+          : `NTT auth failed with status ${response.status}`;
+        throw new Error(errMsg);
+      }
+      continue; // retry
+    }
+
+    const encodedResponse = extractEncDataFromResponseBody(bodyText);
+    if (!encodedResponse) {
+      if (attempt === retries) {
+        try {
+          const logDir = path.join(__dirname, 'logs');
+          fs.mkdirSync(logDir, { recursive: true });
+          const file = path.join(logDir, 'ntt-missing-enc.log');
+          const entry = JSON.stringify({ ts: new Date().toISOString(), url: nttConfig.authUrl, status: response.status, body: bodyText }) + '\n\n';
+          fs.appendFileSync(file, entry, 'utf8');
+        } catch (_) {}
+        console.error('NTT auth did not return encData — raw response saved to logs/ntt-missing-enc.log');
+        throw new Error('Payment gateway returned an unexpected response. Please try again.');
+      }
+      continue; // retry
+    }
+
+    // Success — decrypt and return
+    const decryptedText = decrypt(encodedResponse);
+    const parsed = JSON.parse(decryptedText);
+    return {
+      atomTokenId: parsed.atomTokenId || parsed?.data?.atomTokenId || '',
+      responseDetails: parsed.responseDetails || {},
+      merchTxnId: booking.txnId,
+    };
+  }
 }
 
 app.get('/health', (req, res) => {
@@ -556,12 +592,11 @@ app.get('/pay/ntt', (req, res) => {
 
   res.send(html);
 });
-
 app.post('/api/confirm-payment', async (req, res) => {
   try {
     const encData = req.body?.encData || req.body?.encdata || '';
     if (!encData) {
-      return res.redirect(`${nttConfig.frontendBaseUrl.replace(/\/$/, '')}/tickets.html?status=cancelled`);
+      return res.redirect(`${nttConfig.frontendBaseUrl.replace(/\/$/, '')}/tickets?status=cancelled`);
     }
 
     const decryptedText = decrypt(encData);
@@ -582,7 +617,7 @@ app.post('/api/confirm-payment', async (req, res) => {
 
     const booking = rows[0];
     if (!booking) {
-      return res.redirect(`${nttConfig.frontendBaseUrl.replace(/\/$/, '')}/tickets.html?status=cancelled`);
+      return res.redirect(`${nttConfig.frontendBaseUrl.replace(/\/$/, '')}/tickets?status=cancelled`);
     }
 
     const isSuccess = (signature === respArray[0]?.payDetails?.signature && statusCode === 'OTS0000');
@@ -619,13 +654,78 @@ app.post('/api/confirm-payment', async (req, res) => {
         sendOwnerWhatsApp(`New booking paid: ${booking.booking_id} | INR ${booking.amount} | ${atomTxnId}`)
       ]);
 
-      return res.redirect(`${nttConfig.frontendBaseUrl.replace(/\/$/, '')}/tickets.html?status=success&booking=${encodeURIComponent(booking.booking_id)}&txn=${encodeURIComponent(atomTxnId)}`);
+      return res.redirect(`${nttConfig.frontendBaseUrl.replace(/\/$/, '')}/tickets?status=success&booking=${encodeURIComponent(booking.booking_id)}&txn=${encodeURIComponent(atomTxnId)}`);
     }
 
-    return res.redirect(`${nttConfig.frontendBaseUrl.replace(/\/$/, '')}/tickets.html?status=cancelled&booking=${encodeURIComponent(booking.booking_id)}`);
+    return res.redirect(`${nttConfig.frontendBaseUrl.replace(/\/$/, '')}/tickets?status=cancelled&booking=${encodeURIComponent(booking.booking_id)}`);
   } catch (error) {
     console.error('Confirm payment error:', error);
-    res.redirect(`${nttConfig.frontendBaseUrl.replace(/\/$/, '')}/tickets.html?status=cancelled`);
+    res.redirect(`${nttConfig.frontendBaseUrl.replace(/\/$/, '')}/tickets?status=cancelled`);
+  }
+});
+
+// GET single booking details
+app.get('/api/bookings/:id', async (req, res) => {
+  try {
+    const bookingId = req.params.id;
+    const sql = getSql();
+    const rows = await sql`
+      SELECT booking_id, event_name, event_date, package_type, quantity, table_type, addons_json, amount, payment_status, gateway_payment_id, created_at, customer_email, customer_phone
+      FROM bookings
+      WHERE booking_id = ${bookingId}
+      LIMIT 1
+    `;
+    if (rows.length === 0) {
+      return res.status(404).json({ ok: false, error: 'Booking not found' });
+    }
+    return res.json({ ok: true, booking: rows[0] });
+  } catch (err) {
+    console.error('Fetch booking error:', err);
+    return res.status(500).json({ ok: false, error: 'Internal Server Error' });
+  }
+});
+
+// GET user bookings list
+app.get('/api/user-bookings', async (req, res) => {
+  const authHeader = req.headers.authorization || '';
+  if (!authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ ok: false, error: 'Unauthorized' });
+  }
+  const token = authHeader.split(' ')[1];
+  const firebaseProjectId = process.env.FIREBASE_PROJECT_ID || 'mavricks-auth';
+  try {
+    const firebaseUser = await verifyFirebaseToken(token, firebaseProjectId);
+    const sql = getSql();
+    const email = firebaseUser.email || '';
+    const phone = firebaseUser.phone_number || '';
+    
+    let bookings = [];
+    if (email && phone) {
+      bookings = await sql`
+        SELECT booking_id, event_name, event_date, package_type, quantity, table_type, addons_json, amount, payment_status, gateway_payment_id, created_at
+        FROM bookings
+        WHERE customer_email = ${email} OR customer_phone = ${phone}
+        ORDER BY created_at DESC
+      `;
+    } else if (email) {
+      bookings = await sql`
+        SELECT booking_id, event_name, event_date, package_type, quantity, table_type, addons_json, amount, payment_status, gateway_payment_id, created_at
+        FROM bookings
+        WHERE customer_email = ${email}
+        ORDER BY created_at DESC
+      `;
+    } else if (phone) {
+      bookings = await sql`
+        SELECT booking_id, event_name, event_date, package_type, quantity, table_type, addons_json, amount, payment_status, gateway_payment_id, created_at
+        FROM bookings
+        WHERE customer_phone = ${phone}
+        ORDER BY created_at DESC
+      `;
+    }
+    return res.json({ ok: true, bookings });
+  } catch (err) {
+    console.error('Failed to retrieve user bookings:', err);
+    return res.status(401).json({ ok: false, error: 'Unauthorized: Invalid token' });
   }
 });
 
