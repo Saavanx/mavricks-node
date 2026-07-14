@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact - Mavricks Events</title>
+  <script>
+    (() => {
+      const page = window.location.pathname.split('/').pop() || 'index.html';
+      if (page !== 'index.html') {
+        document.documentElement.classList.add('skip-preloader');
+        return;
+      }
+
+      try {
+        if (window.sessionStorage.getItem('mav-home-preloader-session-seen') === 'true') {
+          document.documentElement.classList.add('skip-preloader');
+        }
+      } catch (error) {}
+    })();
+  </script>
+  <link rel="icon" type="image/png" href="logo/IMG_3480.PNG" />
+  <link rel="apple-touch-icon" href="logo/IMG_3480.PNG" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/contact.css" />
+</head>
+<body class="demo-1" data-preloader-delay="2200">
+
+<div id="mav-preloader" class="mav-preloader" aria-hidden="true">
+  <div class="mav-preloader__inner">
+    <div class="mav-glass"></div>
+    <div class="mav-preloader__stem"></div>
+    <div class="mav-preloader__base"></div>
+    <p class="mav-preloader__text">POURING THE NIGHT</p>
+  </div>
+</div>
+
+<div class="cursor"></div>
+<div class="cursor-follower"></div>
+<div class="page-transition"></div>
+
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">
+      <img src="logo/IMG_3480.PNG" alt="Mavricks Logo" class="logo-img" style="height: 60px; margin-right: 10px;">
+    </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="events.html">Events</a></li>
+    <li><a href="tickets.html">Tickets</a></li>
+    <li><a href="policies.html">Policies</a></li>
+    <li><a href="#" id="navLoginBtn" class="nav-cta">Login</a></li>
+  </ul>
+  <div class="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="page-hero contact-hero">
+  <div class="orb orb-cyan" style="width:500px;height:500px;right:-100px;top:-150px;opacity:0.15;"></div>
+  <div class="orb orb-pink" style="width:350px;height:350px;left:-100px;bottom:-50px;opacity:0.1;"></div>
+  <div class="page-hero-bg"></div>
+  <div class="container">
+    <div class="section-label reveal">Reach Out</div>
+    <h1 class="section-title reveal reveal-delay-1" style="font-size:clamp(3.5rem,8vw,7rem);">LET'S<br/><span>TALK PARTY</span></h1>
+    <p class="section-desc reveal reveal-delay-2" style="margin-top:16px;">Got questions, want to collaborate, or planning a private event? We're all ears — and we love talking parties.</p>
+  </div>
+</section>
+
+<!-- CONTACT SECTION -->
+<section class="section-pad contact-section">
+  <div class="container">
+    <div class="contact-layout">
+
+      <!-- Left: Contact Info -->
+      <div class="contact-info">
+        <div class="section-label reveal">Contact Info</div>
+        <h2 class="section-title reveal reveal-delay-1" style="font-size:clamp(2rem,4vw,3rem);margin-bottom:30px;">GET IN<br/><span>TOUCH</span></h2>
+
+        <div class="info-cards">
+          <div class="info-card reveal">
+            <div class="ic-icon">📞</div>
+            <div class="ic-content">
+              <h4>Phone</h4>
+              <a href="tel:+919454526120">+91 9454526120</a>
+              <span>Mon–Sat, 10AM–8PM</span>
+            </div>
+            <div class="ic-content">
+              <h4>Phone</h4>
+              <a href="tel:+919695167669">+91 96951 67669</a>
+              <span>Mon–Sat, 10AM–8PM</span>
+            </div>
+          </div>
+          <div class="info-card reveal reveal-delay-1">
+            <div class="ic-icon">📧</div>
+            <div class="ic-content">
+              <h4>Email</h4>
+              <a href="mailto:mavricks.fun@gmail.com">mavricks.fun@gmail.com</a>
+              <span>Our team will reply within 24 hours</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Socials -->
+        <div class="contact-socials reveal">
+          <h4>Follow Us</h4>
+          <div class="cs-grid">
+            <a href="https://www.instagram.com/mavricks.event/" target="_blank" class="cs-link">
+              <span class="cs-icon">📸</span>
+              <div>
+                <strong>Instagram</strong>
+                <em>@mavricksevents</em>
+              </div>
+            </a>
+            <a href="https://www.mavricks.fun/" target="_blank" class="cs-link">
+              <span class="cs-icon">🔗</span>
+              <div>
+                <strong>Website</strong>
+                <em>www.mavricks.fun</em>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Contact Form -->
+      <div class="contact-form-wrap reveal reveal-delay-2" id="contact-form" style="scroll-margin-top:96px;">
+        <div class="form-tabs">
+          <button class="form-tab active" data-tab="general">General Enquiry</button>
+          <button class="form-tab" data-tab="private">Private Event</button>
+          <button class="form-tab" data-tab="collab">Collaborate</button>
+        </div>
+
+        <!-- General Form -->
+        <form class="contact-form tab-panel active" data-panel="general" id="general-form">
+          <input type="hidden" name="subject" value="New General Enquiry - Mavricks Events" />
+          <input type="hidden" name="from_name" value="Mavricks Events Website" />
+          <input type="hidden" name="form_type" value="General Enquiry" />
+          <input type="hidden" name="replyto" />
+          <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" style="display:none;" />
+          <div class="form-row">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" name="full_name" placeholder="Your full name" required />
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="tel" name="phone" placeholder="+91 00000 00000" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" name="email" placeholder="your@email.com" required />
+          </div>
+          <div class="form-group">
+            <label>Subject</label>
+            <select name="enquiry_subject">
+              <option>General Enquiry</option>
+              <option>Event Information</option>
+              <option>Ticket Support</option>
+              <option>Refund Request</option>
+              <option>Media & Press</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Message</label>
+            <textarea name="message" rows="5" placeholder="Tell us what's on your mind..."></textarea>
+          </div>
+          <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">
+            Send Message
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>
+          </button>
+        </form>
+
+        <!-- Private Event Form -->
+        <form class="contact-form tab-panel" data-panel="private">
+          <input type="hidden" name="subject" value="New Private Event Request - Mavricks Events" />
+          <input type="hidden" name="from_name" value="Mavricks Events Website" />
+          <input type="hidden" name="form_type" value="Private Event" />
+          <input type="hidden" name="replyto" />
+          <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" style="display:none;" />
+          <div class="form-row">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" name="full_name" placeholder="Your full name" required />
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="tel" name="phone" placeholder="+91 00000 00000" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" name="email" placeholder="your@email.com" required />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Event Type</label>
+              <select name="event_type">
+                <option>Birthday Party</option>
+                <option>Anniversary</option>
+                <option>Corporate Event</option>
+                <option>Bachelor/Bachelorette</option>
+                <option>Graduation Party</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Expected Guests</label>
+              <select name="expected_guests">
+                <option>10 – 30</option>
+                <option>30 – 80</option>
+                <option>80 – 200</option>
+                <option>200 – 500</option>
+                <option>500+</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Preferred Date</label>
+              <input type="date" name="preferred_date" />
+            </div>
+            <div class="form-group">
+              <label>Budget Range</label>
+              <select name="budget_range">
+                <option>₹50,000 – ₹1 Lakh</option>
+                <option>₹1 – ₹3 Lakhs</option>
+                <option>₹3 – ₹10 Lakhs</option>
+                <option>₹10 Lakhs+</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Additional Details</label>
+            <textarea name="additional_details" rows="4" placeholder="Tell us your vision, theme ideas, special requirements..."></textarea>
+          </div>
+          <button type="submit" class="btn-gold" style="width:100%;justify-content:center;">
+            Request Callback
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
+          </button>
+        </form>
+
+        <!-- Collaborate Form -->
+        <form class="contact-form tab-panel" data-panel="collab">
+          <input type="hidden" name="subject" value="New Collaboration Request - Mavricks Events" />
+          <input type="hidden" name="from_name" value="Mavricks Events Website" />
+          <input type="hidden" name="form_type" value="Collaboration" />
+          <input type="hidden" name="replyto" />
+          <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" style="display:none;" />
+          <div class="form-row">
+            <div class="form-group">
+              <label>Name / Brand</label>
+              <input type="text" name="name_or_brand" placeholder="Your name or brand" required />
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="tel" name="phone" placeholder="+91 00000 00000" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email" placeholder="your@email.com" required />
+          </div>
+          <div class="form-group">
+            <label>Collaboration Type</label>
+            <select name="collaboration_type">
+              <option>DJ / Artist Performance</option>
+              <option>Brand Sponsorship</option>
+              <option>Photography / Videography</option>
+              <option>Venue Partnership</option>
+              <option>Social Media Collaboration</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Instagram / Portfolio Link</label>
+            <input type="url" name="portfolio_link" placeholder="https://..." />
+          </div>
+          <div class="form-group">
+            <label>Tell us about yourself</label>
+            <textarea name="about" rows="4" placeholder="Who are you, what you do, why you want to work with Mavricks..."></textarea>
+          </div>
+          <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">
+            Submit Proposal
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- SUCCESS TOAST -->
+<div id="form-toast" class="form-toast">
+  🎉 Message sent! We'll get back to you within 24 hours.
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="logo-main">MAVRICKS</span>
+        <span class="logo-sub">Event & Fun</span>
+        <p>NCR's most electrifying event organizer. We don't just throw parties — we create memories that last a lifetime.</p>
+        <div class="footer-socials">
+          <a href="https://www.mavricks.fun/" target="_blank" class="social-icon">in</a>
+          <a href="https://www.instagram.com/mavricks.event/" target="_blank" class="social-icon">ig</a>
+        </div>
+      </div>
+      <div class="footer-col">  
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="tickets.html">Tickets</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="policies.html">Policies</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Party Types</h4>
+        <ul>
+          <li><a href="events.html">Rooftop Parties</a></li>
+          <li><a href="events.html">Pool Parties</a></li>
+          <li><a href="events.html">Club Nights</a></li>
+          <li><a href="events.html">House Parties</a></li>
+          <li><a href="events.html">DJ Nights</a></li>
+          <li><a href="contact.html">Private Events</a></li>
+        </ul>
+      </div>
+      <div class="footer-col footer-newsletter">
+        <h4>Newsletter</h4>
+        <p style="font-size:0.85rem;color:var(--grey);margin-bottom:12px;">Get party alerts before anyone else.</p>
+        <form>
+          <input type="hidden" name="subject" value="New Newsletter Signup - Mavricks Events" />
+          <input type="hidden" name="from_name" value="Mavricks Events Website" />
+          <input type="hidden" name="signup_source" value="Footer Newsletter - Home Page" />
+          <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" style="display:none;" />
+          <input type="email" name="email" placeholder="Enter your email" required />
+          <button type="submit">Subscribe Now</button>
+        </form>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Mavricks Event. All rights reserved.</p>
+      <p>Designed & Developed by <a href="https://teamtechpro.netlify.app" target="_blank">Team TechPro</a></p>
+    </div>
+  </div>
+</footer>
+
+<!-- Glassmorphic Login Modal -->
+<div id="loginModal" class="login-modal-overlay" style="display: none;">
+  <div class="login-modal-card">
+    <button type="button" class="close-modal-btn" id="closeModalBtn">&times;</button>
+    
+    <!-- Auth Tabs Header (hidden when logged in) -->
+    <div class="login-tabs" id="authTabsHeader">
+      <button type="button" class="tab-btn active" data-tab="signin-tab">Sign In</button>
+      <button type="button" class="tab-btn" data-tab="register-tab">Register</button>
+      <button type="button" class="tab-btn" data-tab="forgot-tab">Reset</button>
+    </div>
+
+    <!-- Sign In Tab -->
+    <div id="signin-tab" class="tab-content auth-logged-out active">
+      <h3 class="modal-title">Welcome Back</h3>
+      <div class="social-login-group">
+        <button type="button" id="googleLoginBtn" class="btn-social google-btn">
+          <svg viewBox="0 0 24 24" class="social-icon"><path fill="#EA4335" d="M12 5.04c1.66 0 3.2.57 4.38 1.69l3.27-3.27C17.67 1.57 14.99 1 12 1 7.35 1 3.39 3.67 1.41 7.56l3.85 2.99c.92-2.76 3.51-4.51 6.74-4.51z"/><path fill="#4285F4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.34H12v4.44h6.46c-.28 1.47-1.11 2.71-2.35 3.54l3.65 2.83c2.14-1.98 3.73-4.89 3.73-8.47z"/><path fill="#FBBC05" d="M5.26 14.45c-.24-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29L1.41 7.56C.51 9.35 0 11.35 0 13.5s.51 4.15 1.41 5.94l3.85-2.99z"/><path fill="#34A853" d="M12 23c3.24 0 5.97-1.07 7.96-2.92l-3.65-2.83c-1.01.68-2.3 1.08-3.79 1.08-3.23 0-5.82-1.75-6.74-4.51l-3.85 2.99C3.39 20.33 7.35 23 12 23z"/></svg>
+          Google
+        </button>
+        <button type="button" id="appleLoginBtn" class="btn-social apple-btn">
+          <svg viewBox="0 0 24 24" class="social-icon"><path fill="#fff" d="M18.71 19.5c-.83 1.24-1.71 2.45-3.09 2.48-1.36.03-1.8-.79-3.36-.79-1.56 0-2.04.77-3.36.82-1.38.05-2.38-1.33-3.22-2.53C4.05 17.02 2.8 12.39 4.49 9.47c.84-1.45 2.34-2.37 3.97-2.4 1.24-.02 2.4.84 3.16.84s2.16-1.04 3.64-.89c.62.03 2.36.25 3.48 1.88-1 .61-1.63 1.62-1.61 2.86.03 1.5 1.25 2.22 1.28 2.25-.03.07-.2 1.1-.94 2.15zM15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.22.67-2.94 1.51-.62.71-1.16 1.85-1.01 2.96 1.11.09 2.27-.58 2.96-1.41z"/></svg>
+          Apple
+        </button>
+      </div>
+      
+      <div class="modal-divider"><span>or with Email</span></div>
+      <form id="emailLoginForm" class="modal-form">
+        <input type="email" id="loginEmail" placeholder="Email Address" required />
+        <input type="password" id="loginPassword" placeholder="Password" required />
+        <button type="submit" class="btn-gold">Sign In</button>
+      </form>
+      
+      <div class="modal-divider"><span>or with Mobile OTP</span></div>
+      <form id="phoneLoginForm" class="modal-form">
+        <input type="tel" id="loginPhone" placeholder="+91 xxxxx xxxxx" required />
+        <div id="recaptcha-container"></div>
+        <button type="submit" class="btn-gold" id="sendOtpBtn">Send OTP</button>
+      </form>
+      
+      <form id="phoneVerificationForm" class="modal-form" style="display: none; margin-top: 14px;">
+        <input type="text" id="otpCode" placeholder="Enter 6-Digit OTP" required />
+        <button type="submit" class="btn-gold">Verify OTP</button>
+      </form>
+    </div>
+
+    <!-- Register Tab -->
+    <div id="register-tab" class="tab-content auth-logged-out">
+      <h3 class="modal-title">Create Account</h3>
+      <form id="emailRegisterForm" class="modal-form">
+        <input type="text" id="registerName" placeholder="Full Name" required />
+        <input type="email" id="registerEmail" placeholder="Email Address" required />
+        <input type="password" id="registerPassword" placeholder="Password" required />
+        <button type="submit" class="btn-gold">Register</button>
+      </form>
+    </div>
+
+    <!-- Forgot Password Tab -->
+    <div id="forgot-tab" class="tab-content auth-logged-out">
+      <h3 class="modal-title">Reset Password</h3>
+      <p class="modal-subtitle">Enter your email address to receive a password reset link.</p>
+      <form id="forgotPasswordForm" class="modal-form">
+        <input type="email" id="forgotEmail" placeholder="Email Address" required />
+        <button type="submit" class="btn-gold">Send Reset Link</button>
+      </form>
+    </div>
+
+    <!-- Profile Management View -->
+    <div id="profileView" class="tab-content auth-logged-in" style="display: none;">
+      <h3 class="modal-title">Manage Profile</h3>
+      
+      <!-- Verification Alert Banner -->
+      <div id="verificationBanner" class="user-profile-status" style="flex-direction: column; align-items: stretch; gap: 8px; margin-bottom: 16px; display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span id="verificationStatusText">Email Not Verified</span>
+          <button type="button" id="sendVerifyEmailBtn" style="font-size: 12px; background: none; border: none; color: #f7b731; font-weight: 700; text-decoration: underline; cursor: pointer;">Verify Now</button>
+        </div>
+      </div>
+
+      <!-- Profile Edit Form -->
+      <form id="profileEditForm" class="modal-form">
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <label style="font-size: 11px; color: rgba(255,255,255,0.6); margin-left: 4px; text-align: left;">Full Name</label>
+          <input type="text" id="profileName" placeholder="Full Name" required />
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <label style="font-size: 11px; color: rgba(255,255,255,0.6); margin-left: 4px; text-align: left;">Email Address</label>
+          <input type="email" id="profileEmail" placeholder="Email Address" required />
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <label style="font-size: 11px; color: rgba(255,255,255,0.6); margin-left: 4px; text-align: left;">Date of Birth</label>
+          <input type="date" id="profileDob" style="color-scheme: dark;" />
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <label style="font-size: 11px; color: rgba(255,255,255,0.6); margin-left: 4px; text-align: left;">City</label>
+          <input type="text" id="profileCity" placeholder="City" />
+        </div>
+        <button type="submit" class="btn-gold" style="margin-top: 8px;">Save Profile</button>
+      </form>
+
+      <div class="modal-divider"><span>Change Password</span></div>
+
+      <!-- Password Change Form -->
+      <form id="profilePasswordForm" class="modal-form">
+        <input type="password" id="profileNewPassword" placeholder="New Password" required minlength="6" />
+        <input type="password" id="profileConfirmPassword" placeholder="Confirm New Password" required minlength="6" />
+        <button type="submit" class="btn-gold">Update Password</button>
+      </form>
+
+      <button type="button" id="profileLogoutBtn" class="btn-social" style="width: 100%; margin-top: 24px; border-color: rgba(239, 87, 119, 0.4); background: rgba(239, 87, 119, 0.08); color: #ef5777; font-weight: 700;">
+        Sign Out
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK CDNs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="js/lib/lenis.min.js"></script>
+<script src="js/form-config.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

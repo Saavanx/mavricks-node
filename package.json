@@ -1,0 +1,26 @@
+{
+  "name": "mavricks-events",
+  "version": "1.0.0",
+  "description": "Mavricks Events — static marketing site with Netlify serverless functions (OTP) and a Google Apps Script form/email backend.",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "check": "node --check js/main.js && node --check js/form-config.js && node --check netlify/functions/_lib.js && node --check netlify/functions/create-payment-session.js && node --check netlify/functions/confirm-payment.js && node --check server.js",
+    "test": "node --test test/payment-flow.test.js",
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "compression": "^1.8.1",
+    "cors": "^2.8.0",
+    "dotenv": "^16.4.0",
+    "express": "^4.21.0",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "jwks-rsa": "^4.1.0"
+  }
+}

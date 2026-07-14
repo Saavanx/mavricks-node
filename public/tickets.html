@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tickets - Mavricks Events</title>
+  <script>
+    (() => {
+      const page = window.location.pathname.split('/').pop() || 'index.html';
+      if (page !== 'index.html') {
+        document.documentElement.classList.add('skip-preloader');
+        return;
+      }
+
+      try {
+        if (window.sessionStorage.getItem('mav-home-preloader-session-seen') === 'true') {
+          document.documentElement.classList.add('skip-preloader');
+        }
+      } catch (error) {}
+    })();
+  </script>
+  <link rel="icon" type="image/png" href="logo/IMG_3480.PNG" />
+  <link rel="apple-touch-icon" href="logo/IMG_3480.PNG" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/tickets.css" />
+  <style>
+    .login-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(4, 5, 8, 0.7);
+      backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      transition: opacity 0.3s ease;
+    }
+    .login-modal-card {
+      width: 90%;
+      max-width: 440px;
+      background: rgba(22, 25, 37, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(247, 183, 49, 0.35);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(247, 183, 49, 0.15);
+      border-radius: 20px;
+      padding: 32px;
+      position: relative;
+      color: #fff;
+      font-family: 'Outfit', 'Inter', sans-serif;
+    }
+    .close-modal-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 28px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .close-modal-btn:hover {
+      color: #f7b731;
+    }
+    .login-tabs {
+      display: flex;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 24px;
+    }
+    .tab-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-bottom: 2px solid transparent;
+    }
+    .tab-btn.active {
+      color: #f7b731;
+      border-bottom-color: #f7b731;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .modal-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      text-align: center;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+    .modal-subtitle {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .social-login-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .btn-social {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-social:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(247, 183, 49, 0.5);
+    }
+    .social-icon {
+      width: 18px;
+      height: 18px;
+    }
+    .modal-divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 20px 0;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 12px;
+    }
+    .modal-divider::before, .modal-divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .modal-divider:not(:empty)::before {
+      margin-right: .5em;
+    }
+    .modal-divider:not(:empty)::after {
+      margin-left: .5em;
+    }
+    .modal-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .modal-form input {
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .modal-form input:focus {
+      outline: none;
+      border-color: #f7b731;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 10px rgba(247, 183, 49, 0.15);
+    }
+    .modal-form button.btn-gold {
+      padding: 12px;
+      border: 0;
+      background: #f7b731;
+      color: #111;
+      font-weight: 700;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .modal-form button.btn-gold:hover {
+      background: #fbc554;
+    }
+    .modal-form button.btn-gold:active {
+      transform: scale(0.98);
+    }
+    .user-profile-status {
+      background: rgba(247, 183, 49, 0.08);
+      border: 1px solid rgba(247, 183, 49, 0.2);
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    .user-profile-status button {
+      background: none;
+      border: none;
+      color: #f7b731;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    #recaptcha-container {
+      margin: 8px 0;
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body class="demo-1" data-preloader-delay="2200">
+
+<div id="mav-preloader" class="mav-preloader" aria-hidden="true">
+  <div class="mav-preloader__inner">
+    <div class="mav-glass"></div>
+    <div class="mav-preloader__stem"></div>
+    <div class="mav-preloader__base"></div>
+    <p class="mav-preloader__text">POURING THE NIGHT</p>
+  </div>
+</div>
+
+<div class="cursor"></div>
+<div class="cursor-follower"></div>
+<div class="page-transition"></div>
+
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">
+      <img src="logo/IMG_3480.PNG" alt="Mavricks Logo" class="logo-img" style="height: 60px; margin-right: 10px;">
+    </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="events.html">Events</a></li>
+    <li><a href="tickets.html">Tickets</a></li>
+    <li><a href="policies.html">Policies</a></li>
+    <li><a href="#" id="navLoginBtn" class="nav-cta">Login</a></li>
+  </ul>
+  <div class="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<section class="page-hero tickets-hero">
+  <div class="orb orb-gold" style="width:500px;height:500px;right:-100px;top:-100px;opacity:0.2;"></div>
+  <div class="page-hero-bg"></div>
+  <div class="container">
+    <div class="section-label reveal">Book Your Spot</div>
+    <h1 class="section-title reveal reveal-delay-1" style="font-size:clamp(3.5rem,8vw,7rem);">GET YOUR<br/><span>TICKETS</span></h1>
+    <p class="section-desc reveal reveal-delay-2" style="margin-top:16px;">Compare trusted booking platforms, choose the best fee route, and lock your spot for Mavricks nights across NCR.</p>
+  </div>
+</section>
+
+<!-- TICKET EVENT SELECTOR -->
+<section class="section-pad tickets-section">
+  <div class="container">
+    <div class="tickets-section-head reveal">
+      <div>
+        <div class="section-label">Booking Options</div>
+        <h2 class="tickets-section-title">CHOOSE YOUR <span>BEST ROUTE</span></h2>
+        <p class="tickets-section-copy">Use the recommended platform for lighter convenience charges, compare alternate listings, or contact the team directly for premium table reservations.</p>
+      </div>
+      <div class="tickets-live-pill">
+        <div class="avail-dot"></div>
+        <span>Listings are live</span>
+      </div>
+    </div>
+
+    <!-- Event Selector Tabs -->
+    <!-- <div class="event-tabs-wrap">
+      <div class="section-label reveal">Select Event</div>
+      <div class="event-tabs reveal reveal-delay-1">
+        <button class="et-tab active" data-event="sky-high">Sky High Saturdays</button>
+        <button class="et-tab" data-event="splash">Splash Sundays</button>
+        <button class="et-tab" data-event="underground">Underground Fridays</button>
+        <button class="et-tab" data-event="mansion">The Mansion Experience</button>
+        <button class="et-tab" data-event="neon">Neon Carnival Night</button>
+      </div>
+    </div> -->
+
+    <!-- Ticket Purchase Layout -->
+    <div class="ticket-layout">
+      <!-- Left: No Active Events -->
+      <div class="ticket-tiers">
+        <div class="event-info-bar reveal">
+          <div class="eib-badge-row">
+            <span class="tag tag-gold">Test Event</span>
+            <span class="eib-status">Gateway Test Mode</span>
+          </div>
+          <div class="eib-text">
+            <h2 id="event-title">MARCH MADNESS — ROOFTOP SPLASH</h2>
+            <p class="eib-desc">This is a dedicated test booking for the NTT Data payment gateway flow. Choose a package, complete the checkout, and verify the payment redirect, callback, and receipt journey end to end.</p>
+          </div>
+          <div class="eib-meta-grid">
+            <div class="eib-meta-item">
+              <div class="eib-meta-icon">📅</div>
+              <div><strong>Date</strong><span>21 March 2026</span></div>
+            </div>
+            <div class="eib-meta-item">
+              <div class="eib-meta-icon">📍</div>
+              <div><strong>Venue</strong><span>Rooftop Lounge, NCR</span></div>
+            </div>
+            <div class="eib-meta-item">
+              <div class="eib-meta-icon">🎯</div>
+              <div><strong>Goal</strong><span>Test gateway success flow</span></div>
+            </div>
+          </div>
+          <div class="test-flow-steps">
+            <div class="test-flow-step">1. Select your pass</div>
+            <div class="test-flow-step">2. Pay through the gateway</div>
+            <div class="test-flow-step">3. Review your receipt</div>
+          </div>
+          <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;">
+            <a href="https://www.instagram.com/mavricks.event/" target="_blank" class="btn-primary">Follow on Instagram</a>
+            <a href="contact.html" class="btn-outline">Get Notified</a>
+          </div>
+        </div>
+      </div>
+      <!-- Right: Checkout Panel -->
+      <div class="checkout-panel reveal">
+        <div class="cp-kicker">Secure Checkout</div>
+        <h3 class="cp-title">Reserve Your Spot</h3>
+        <div class="booking-note">
+          <strong>Demo & live-ready flow</strong>
+          <p>Use this checkout to test the booking journey. When the gateway credentials are configured, the same flow will connect to the live payment provider.</p>
+        </div>
+
+        <form id="payment-form" class="payment-form" data-event-key="march-madness">
+          <input type="hidden" name="eventKey" value="march-madness" />
+          <div class="payment-form-group">
+            <label for="packageType">Package</label>
+            <select name="packageType" id="packageType">
+              <option value="stag">Stag Entry — ₹2,299</option>
+              <option value="female">Ladies Entry — ₹499</option>
+              <option value="couple">Couple Entry — ₹2,799</option>
+            </select>
+          </div>
+
+          <div class="payment-form-group">
+            <label for="quantity">Quantity</label>
+            <input type="number" name="quantity" id="quantity" min="1" max="20" value="1" />
+          </div>
+
+          <div class="payment-form-group">
+            <label for="tableType">Table</label>
+            <select name="tableType" id="tableType">
+              <option value="">No table</option>
+              <option value="regular">Regular Table — ₹14,999</option>
+              <option value="vvip">VVIP Table — ₹22,999</option>
+            </select>
+          </div>
+
+          <div class="payment-form-group">
+            <label>Add-ons</label>
+            <div class="checkbox-group">
+              <label><input type="checkbox" name="addOns" value="hukkah" /> Hukkah</label>
+              <label><input type="checkbox" name="addOns" value="bottle" /> Bottle</label>
+              <label><input type="checkbox" name="addOns" value="mixer" /> Mixer</label>
+            </div>
+          </div>
+
+          <div class="payment-form-group">
+            <label for="customerEmail">Email</label>
+            <input type="email" name="customerEmail" id="customerEmail" placeholder="you@example.com" required />
+          </div>
+
+          <div class="payment-form-group">
+            <label for="customerPhone">Phone</label>
+            <input type="tel" name="customerPhone" id="customerPhone" placeholder="+91xxxxxxxxxx" required />
+          </div>
+
+          <!-- Logged In Profile Widget -->
+          <div id="userProfileWidget" class="user-profile-status" style="display: none;">
+            <span>Logged in as: <strong id="userProfileName">Guest</strong></span>
+            <button type="button" id="logoutBtn">Sign Out</button>
+          </div>
+
+          <button type="submit" id="submitPaymentBtn" class="btn-gold cp-cta">Proceed to Payment</button>
+        </form>
+
+        <div class="ticket-policies">
+          <div class="policy-item">
+            <span>🎟️</span>
+            <div>
+              <strong>Platform Booking</strong>
+              <p>Tickets are sold through Sort My Scene, BookMyShow, and District when listings are live.</p>
+            </div>
+          </div>
+          <div class="policy-item">
+            <span>🍽️</span>
+            <div>
+              <strong>Extra Charges</strong>
+              <p>Food, wine, and hukkah are separate and not included in entry tickets.</p>
+            </div>
+          </div>
+          <div class="policy-item">
+            <span>🪑</span>
+            <div>
+              <strong>Table Booking</strong>
+              <p>Table reservations are handled directly. Contact the team for group or VIP table enquiries.</p>
+            </div>
+          </div>
+          <div class="policy-item">
+            <span>📄</span>
+            <div>
+              <strong>Policies</strong>
+              <p>Read our <a href="policies.html" style="color:#ffcf4d; text-decoration:underline;">Terms, Cancellation & Payment Policy</a> before booking.</p>
+            </div>
+          </div>
+        </div>
+        <div class="cp-contact">
+          <p>Want to plan a private event or make a group enquiry?</p>
+          <a href="contact.html" class="btn-gold cp-cta">Contact the Team</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BADGES -->
+<section class="trust-section section-pad" style="padding:60px 0;">
+  <div class="container">
+    <div class="trust-grid">
+      <div class="trust-item reveal">
+        <div class="trust-icon">🔒</div>
+        <strong>Secure Payments</strong>
+        <span>256-bit SSL encryption</span>
+      </div>
+      <div class="trust-item reveal reveal-delay-1">
+        <div class="trust-icon">✅</div>
+        <strong>Verified Events</strong>
+        <span>Every event is officially authorized</span>
+      </div>
+      <div class="trust-item reveal reveal-delay-2">
+        <div class="trust-icon">📲</div>
+        <strong>Instant Delivery</strong>
+        <span>Tickets to your email in seconds</span>
+      </div>
+      <div class="trust-item reveal reveal-delay-3">
+        <div class="trust-icon">🎯</div>
+        <strong>Best Price</strong>
+        <span>No hidden fees & No Extra Charges</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section-pad faq-section">
+  <div class="container">
+    <div class="section-label reveal">Help</div>
+    <h2 class="section-title reveal reveal-delay-1">TICKET <span>FAQ</span></h2>
+    <div class="faq-grid" style="margin-top:40px;">
+      <div class="accordion-item reveal">
+        <div class="accordion-header">
+          <span>How do I receive my tickets?</span>
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="accordion-body">
+          <p>Once your payment is confirmed, you'll receive an e-ticket with a unique QR code to your registered email. You can also access your tickets in your account dashboard. Simply show the QR at the venue entrance for scanning.</p>
+        </div>
+      </div>
+      <div class="accordion-item reveal reveal-delay-1">
+        <div class="accordion-header">
+          <span>Can I get a refund if I can't attend?</span>
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="accordion-body">
+          <p>Yes! Refunds are available based on the timeline in our policy page. Please review the full <a href="policies.html#cancellation" style="color:#ffcf4d; text-decoration:underline;">cancellation policy</a> before booking.</p>
+        </div>
+      </div>
+      <div class="accordion-item reveal reveal-delay-2">
+        <div class="accordion-header">
+          <span>What's included in VIP packages?</span>
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="accordion-body">
+          <p>VIP packages include a reserved table, 1 bottle of premium spirits, unlimited soft drinks & mixers, a dedicated personal host, priority entry, access to the exclusive VIP lounge, and complimentary valet parking at select venues.</p>
+        </div>
+      </div>
+      <div class="accordion-item reveal">
+        <div class="accordion-header">
+          <span>Is there an age restriction?</span>
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="accordion-body">
+          <p>All our events are strictly 21+ for events involving alcohol. Please carry a valid government-issued photo ID. Entry will be denied without proper age verification. Some daytime events like pool parties may be 18+.</p>
+        </div>
+      </div>
+      <div class="accordion-item reveal reveal-delay-1">
+        <div class="accordion-header">
+          <span>What's the dress code?</span>
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="accordion-body">
+          <p>Smart casual to semi-formal. No shorts, flip-flops, or sportswear for club nights. Pool parties are obviously pool-wear friendly. Rooftop and house parties: smart casual. Specific events may have themed dress codes mentioned in the event details.</p>
+        </div>
+      </div>
+      <div class="accordion-item reveal reveal-delay-2">
+        <div class="accordion-header">
+          <span>Can I buy tickets at the venue?</span>
+          <span class="acc-icon">+</span>
+        </div>
+        <div class="accordion-body">
+          <p>We strongly recommend buying online in advance as our events sell out fast. If available, walk-in tickets at the venue are priced 30–40% higher than online prices. No guarantees of availability at the door.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Payment Success Modal -->
+<div class="modal" id="success-modal">
+  <div class="modal-overlay"></div>
+  <div class="modal-box">
+    <div class="modal-success-icon">🎉</div>
+    <h2>Booking Confirmed!</h2>
+    <p>Your tickets are on their way to your inbox. Get ready to party!</p>
+    <div id="receipt-summary" class="receipt-summary" style="display:none;"></div>
+    <button class="btn-primary modal-close" style="margin-top:20px;">Done</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="logo-main">MAVRICKS</span>
+        <span class="logo-sub">Event & Fun</span>
+        <p>NCR's most electrifying event organizer. We don't just throw parties — we create memories that last a lifetime.</p>
+        <div class="footer-socials">
+          <a href="https://www.mavricks.fun/" target="_blank" class="social-icon">in</a>
+          <a href="https://www.instagram.com/mavricks.event/" target="_blank" class="social-icon">ig</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="tickets.html">Tickets</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Party Types</h4>
+        <ul>
+          <li><a href="events.html">Rooftop Parties</a></li>
+          <li><a href="events.html">Pool Parties</a></li>
+          <li><a href="events.html">Club Nights</a></li>
+          <li><a href="events.html">House Parties</a></li>
+          <li><a href="events.html">DJ Nights</a></li>
+          <li><a href="contact.html">Private Events</a></li>
+        </ul>
+      </div>
+      <div class="footer-col footer-newsletter">
+        <h4>Newsletter</h4>
+        <p style="font-size:0.85rem;color:var(--grey);margin-bottom:12px;">Get party alerts before anyone else.</p>
+        <form>
+          <input type="hidden" name="subject" value="New Newsletter Signup - Mavricks Events" />
+          <input type="hidden" name="from_name" value="Mavricks Events Website" />
+          <input type="hidden" name="signup_source" value="Footer Newsletter - Home Page" />
+          <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" style="display:none;" />
+          <input type="email" name="email" placeholder="Enter your email" required />
+          <button type="submit">Subscribe Now</button>
+        </form>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Mavricks Event. All rights reserved.</p>
+      <p>Designed & Developed by <a href="https://teamtechpro.netlify.app" target="_blank">Team TechPro</a></p>
+    </div>
+  </div>
+</footer>
+
+<!-- Glassmorphic Login Modal -->
+<div id="loginModal" class="login-modal-overlay" style="display: none;">
+  <div class="login-modal-card">
+    <button type="button" class="close-modal-btn" id="closeModalBtn">&times;</button>
+    
+    <!-- Auth Tabs Header (hidden when logged in) -->
+    <div class="login-tabs" id="authTabsHeader">
+      <button type="button" class="tab-btn active" data-tab="signin-tab">Sign In</button>
+      <button type="button" class="tab-btn" data-tab="register-tab">Register</button>
+      <button type="button" class="tab-btn" data-tab="forgot-tab">Reset</button>
+    </div>
+
+    <!-- Sign In Tab -->
+    <div id="signin-tab" class="tab-content auth-logged-out active">
+      <h3 class="modal-title">Welcome Back</h3>
+      <div class="social-login-group">
+        <button type="button" id="googleLoginBtn" class="btn-social google-btn">
+          <svg viewBox="0 0 24 24" class="social-icon"><path fill="#EA4335" d="M12 5.04c1.66 0 3.2.57 4.38 1.69l3.27-3.27C17.67 1.57 14.99 1 12 1 7.35 1 3.39 3.67 1.41 7.56l3.85 2.99c.92-2.76 3.51-4.51 6.74-4.51z"/><path fill="#4285F4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.34H12v4.44h6.46c-.28 1.47-1.11 2.71-2.35 3.54l3.65 2.83c2.14-1.98 3.73-4.89 3.73-8.47z"/><path fill="#FBBC05" d="M5.26 14.45c-.24-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29L1.41 7.56C.51 9.35 0 11.35 0 13.5s.51 4.15 1.41 5.94l3.85-2.99z"/><path fill="#34A853" d="M12 23c3.24 0 5.97-1.07 7.96-2.92l-3.65-2.83c-1.01.68-2.3 1.08-3.79 1.08-3.23 0-5.82-1.75-6.74-4.51l-3.85 2.99C3.39 20.33 7.35 23 12 23z"/></svg>
+          Google
+        </button>
+        <button type="button" id="appleLoginBtn" class="btn-social apple-btn">
+          <svg viewBox="0 0 24 24" class="social-icon"><path fill="#fff" d="M18.71 19.5c-.83 1.24-1.71 2.45-3.09 2.48-1.36.03-1.8-.79-3.36-.79-1.56 0-2.04.77-3.36.82-1.38.05-2.38-1.33-3.22-2.53C4.05 17.02 2.8 12.39 4.49 9.47c.84-1.45 2.34-2.37 3.97-2.4 1.24-.02 2.4.84 3.16.84s2.16-1.04 3.64-.89c.62.03 2.36.25 3.48 1.88-1 .61-1.63 1.62-1.61 2.86.03 1.5 1.25 2.22 1.28 2.25-.03.07-.2 1.1-.94 2.15zM15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.22.67-2.94 1.51-.62.71-1.16 1.85-1.01 2.96 1.11.09 2.27-.58 2.96-1.41z"/></svg>
+          Apple
+        </button>
+      </div>
+      
+      <div class="modal-divider"><span>or with Email</span></div>
+      <form id="emailLoginForm" class="modal-form">
+        <input type="email" id="loginEmail" placeholder="Email Address" required />
+        <input type="password" id="loginPassword" placeholder="Password" required />
+        <button type="submit" class="btn-gold">Sign In</button>
+      </form>
+      
+      <div class="modal-divider"><span>or with Mobile OTP</span></div>
+      <form id="phoneLoginForm" class="modal-form">
+        <input type="tel" id="loginPhone" placeholder="+91 xxxxx xxxxx" required />
+        <div id="recaptcha-container"></div>
+        <button type="submit" class="btn-gold" id="sendOtpBtn">Send OTP</button>
+      </form>
+      
+      <form id="phoneVerificationForm" class="modal-form" style="display: none; margin-top: 14px;">
+        <input type="text" id="otpCode" placeholder="Enter 6-Digit OTP" required />
+        <button type="submit" class="btn-gold">Verify OTP</button>
+      </form>
+    </div>
+
+    <!-- Register Tab -->
+    <div id="register-tab" class="tab-content auth-logged-out">
+      <h3 class="modal-title">Create Account</h3>
+      <form id="emailRegisterForm" class="modal-form">
+        <input type="text" id="registerName" placeholder="Full Name" required />
+        <input type="email" id="registerEmail" placeholder="Email Address" required />
+        <input type="password" id="registerPassword" placeholder="Password" required />
+        <button type="submit" class="btn-gold">Register</button>
+      </form>
+    </div>
+
+    <!-- Forgot Password Tab -->
+    <div id="forgot-tab" class="tab-content auth-logged-out">
+      <h3 class="modal-title">Reset Password</h3>
+      <p class="modal-subtitle">Enter your email address to receive a password reset link.</p>
+      <form id="forgotPasswordForm" class="modal-form">
+        <input type="email" id="forgotEmail" placeholder="Email Address" required />
+        <button type="submit" class="btn-gold">Send Reset Link</button>
+      </form>
+    </div>
+
+    <!-- Profile Management View -->
+    <div id="profileView" class="tab-content auth-logged-in" style="display: none;">
+      <h3 class="modal-title">Manage Profile</h3>
+      
+      <!-- Verification Alert Banner -->
+      <div id="verificationBanner" class="user-profile-status" style="flex-direction: column; align-items: stretch; gap: 8px; margin-bottom: 16px; display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span id="verificationStatusText">Email Not Verified</span>
+          <button type="button" id="sendVerifyEmailBtn" style="font-size: 12px; background: none; border: none; color: #f7b731; font-weight: 700; text-decoration: underline; cursor: pointer;">Verify Now</button>
+        </div>
+      </div>
+
+      <!-- Profile Edit Form -->
+      <form id="profileEditForm" class="modal-form">
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <label style="font-size: 11px; color: rgba(255,255,255,0.6); margin-left: 4px; text-align: left;">Full Name</label>
+          <input type="text" id="profileName" placeholder="Full Name" required />
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <label style="font-size: 11px; color: rgba(255,255,255,0.6); margin-left: 4px; text-align: left;">Email Address</label>
+          <input type="email" id="profileEmail" placeholder="Email Address" required />
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <label style="font-size: 11px; color: rgba(255,255,255,0.6); margin-left: 4px; text-align: left;">Date of Birth</label>
+          <input type="date" id="profileDob" style="color-scheme: dark;" />
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <label style="font-size: 11px; color: rgba(255,255,255,0.6); margin-left: 4px; text-align: left;">City</label>
+          <input type="text" id="profileCity" placeholder="City" />
+        </div>
+        <button type="submit" class="btn-gold" style="margin-top: 8px;">Save Profile</button>
+      </form>
+
+      <div class="modal-divider"><span>Change Password</span></div>
+
+      <!-- Password Change Form -->
+      <form id="profilePasswordForm" class="modal-form">
+        <input type="password" id="profileNewPassword" placeholder="New Password" required minlength="6" />
+        <input type="password" id="profileConfirmPassword" placeholder="Confirm New Password" required minlength="6" />
+        <button type="submit" class="btn-gold">Update Password</button>
+      </form>
+
+      <button type="button" id="profileLogoutBtn" class="btn-social" style="width: 100%; margin-top: 24px; border-color: rgba(239, 87, 119, 0.4); background: rgba(239, 87, 119, 0.08); color: #ef5777; font-weight: 700;">
+        Sign Out
+      </button>
+    </div>
+  </div>
+</div>>Send Reset Link</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK CDNs (Compat version for pure script usage) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+  window.MAVRICKS_PAYMENT_API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:4000/api' : 'https://api.mavricks.fun/api';
+</script>
+<script src="js/lib/lenis.min.js"></script>
+<script src="js/form-config.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
