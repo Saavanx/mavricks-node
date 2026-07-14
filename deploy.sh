@@ -12,7 +12,7 @@ BACKUP_PATH="/var/www/mavricks-backend.bak"
 TAR_FILE="/Users/saavan/Downloads/mavricks-backend.tar.gz"
 
 echo "=== Step 1: Tarring local codebase ==="
-tar -czf "$TAR_FILE" --exclude=node_modules --exclude=.git -C "/Users/saavan/Documents/GitHub/Mavricks" .
+tar -czf "$TAR_FILE" --exclude=node_modules --exclude=.git -C "/Users/saavan/Documents/GitHub/mavricks-node" .
 
 echo "=== Step 2: Uploading tarball to server ==="
 scp -i "$PEM_KEY" "$TAR_FILE" "$USER@$SERVER_IP:/home/$USER/mavricks-backend.tar.gz"
