@@ -309,6 +309,23 @@ async function initiateNttAuth(booking, retries = 2) {
 
     const encodedResponse = extractEncDataFromResponseBody(bodyText);
     if (!encodedResponse) {
+      // Try to detect structured JSON error from gateway (e.g. {"encData":null,"txnStatusCode":"OTS0451","txnDescription":"INVALID MERCHANT"})
+      let gatewayErrMsg = null;
+      try {
+        const parsed = JSON.parse(bodyText);
+        if (parsed && parsed.encData === null && (parsed.txnStatusCode || parsed.txnDescription || parsed.txnMessage)) {
+          const code = parsed.txnStatusCode || '';
+          const desc = parsed.txnDescription || parsed.txnMessage || 'Gateway rejected the request';
+          console.error(`NTT gateway error: code=${code}, desc=${desc}`);
+          // OTS0451 = Invalid Merchant — credentials not activated on this endpoint
+          if (code === 'OTS0451' || desc.toUpperCase().includes('INVALID MERCHANT')) {
+            gatewayErrMsg = 'Payment gateway credentials are not yet activated. Please book via WhatsApp while we complete the setup.';
+          } else {
+            gatewayErrMsg = `Payment gateway error (${code}): ${desc}`;
+          }
+        }
+      } catch (_) {}
+
       if (attempt === retries) {
         try {
           const logDir = path.join(__dirname, 'logs');
@@ -318,7 +335,7 @@ async function initiateNttAuth(booking, retries = 2) {
           fs.appendFileSync(file, entry, 'utf8');
         } catch (_) {}
         console.error('NTT auth did not return encData — raw response saved to logs/ntt-missing-enc.log');
-        throw new Error('Payment gateway returned an unexpected response. Please try again.');
+        throw new Error(gatewayErrMsg || 'Payment gateway returned an unexpected response. Please try again.');
       }
       continue; // retry
     }
