@@ -488,6 +488,15 @@ app.post('/api/create-payment-session', async (req, res) => {
       return res.status(409).json({ ok: false, error: 'Sold out' });
     }
 
+    // Allow ₹1 test override (internal testing only — amount capped to minimum ₹1)
+    if (payload.overrideAmount !== undefined) {
+      const override = Number(payload.overrideAmount);
+      if (override >= 1) {
+        normalized.amount = String(override);
+        console.log(`[TEST] Payment amount overridden to ₹${override} by overrideAmount flag`);
+      }
+    }
+
     // Initiate NTT Auth session
     const auth = await initiateNttAuth({
       bookingId,
